@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import './Sidebar.css'; // Asegúrate de importar tus estilos
+import './Sidebar.css';
 
 function Sidebar() {
-  // El estado guarda el nombre del enlace seleccionado (por defecto vacío o el inicial)
-  const [seccionActiva, setSeccionActiva] = useState('');
+  const [seccionActiva, setSeccionActiva] = useState('teoria');
 
   const manejarClic = (seccion) => {
     setSeccionActiva(seccion);
@@ -11,23 +10,39 @@ function Sidebar() {
 
   return (
     <nav className="sidebar">
-      {/* Enlace 1: Práctica */}
-      <a 
-        className={`nav-link ${seccionActiva === 'practica' ? 'activo' : ''}`} 
-        href="#practica"
-        onClick={() => manejarClic('practica')}
-      >
-        Práctica
-      </a>
+      <div className="brand">
+        <div className="brand-mark">AN</div>
+        <div>
+          <strong>Análisis Numérico</strong>
+          <small>Jacobi y Gauss-Seidel</small>
+        </div>
+      </div>
 
-      {/* Enlace 2: Otro ejemplo para que veas cómo alternan */}
-      <a 
-        className={`nav-link ${seccionActiva === 'teoria' ? 'activo' : ''}`} 
-        href="#teoria"
-        onClick={() => manejarClic('teoria')}
-      >
-        Teoría
-      </a>
+      <div className="nav-menu">
+        <a 
+          className={`nav-link ${seccionActiva === 'teoria' ? 'active' : ''}`} 
+          href="#teoria"
+          onClick={() => manejarClic('teoria')}
+        >
+          📘 Teoría
+        </a>
+
+        <a 
+          className={`nav-link ${seccionActiva === 'practica' ? 'active' : ''}`} 
+          href="#practica"
+          onClick={() => manejarClic('practica')}
+        >
+          📝 Ejercicios
+        </a>
+
+        <a 
+          className={`nav-link ${seccionActiva === 'calculadora' ? 'active' : ''}`} 
+          href="#calculadora"
+          onClick={() => manejarClic('calculadora')}
+        >
+          🧮 Calculadora
+        </a>
+      </div>
     </nav>
   );
 }

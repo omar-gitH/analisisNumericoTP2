@@ -1,0 +1,112 @@
+.practica-container {
+  font-family: inherit;
+}
+
+.controls {
+  margin-bottom: 20px;
+}
+
+.matrices-input {
+  display: flex;
+  gap: 30px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-around;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.matrix-bracket {
+  position: relative;
+  display: inline-block;
+  padding: 10px 15px;
+  margin-top: 10px;
+}
+
+.matrix-bracket::before,
+.matrix-bracket::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 15px;
+  border: 3px solid #64748b;
+  border-radius: 4px;
+}
+
+.matrix-bracket::before {
+  left: 0;
+  border-right: none;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.matrix-bracket::after {
+  right: 0;
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.matrix-column-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.matrix-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+input[type="text"], input[type="number"], select {
+  padding: 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 1rem;
+  color: #334155;
+  transition: all 0.2s ease;
+  background-color: #fff;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+input[type="text"]:hover, input[type="number"]:hover, select:hover {
+  border-color: #94a3b8;
+}
+
+button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+button:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.error-message {
+  margin: 15px 0;
+  padding: 12px 15px;
+  background-color: #fef2f2;
+  border-left: 4px solid #ef4444;
+  color: #991b1b;
+  border-radius: 0 6px 6px 0;
+}
