@@ -7,7 +7,7 @@ const Calculadora = () => {
   const [B, setB] = useState(Array(3).fill(0));
   const [X0, setX0] = useState(Array(3).fill(0));
   const [iterations, setIterations] = useState(3);
-  const [stopMode, setStopMode] = useState('iterations'); // 'iterations' or 'tolerance'
+  const [stopMode, setStopMode] = useState('iterations'); // 'iterations', 'tolerance' or 'both'
   const [tolerance, setTolerance] = useState(0.001);
   const [method, setMethod] = useState('ambos'); // 'ambos', 'jacobi', 'gauss'
   const [results, setResults] = useState(null);
@@ -78,7 +78,7 @@ const Calculadora = () => {
       const tol = Math.abs(parseFloat(tolerance) || 0);
       const maxIter = 1000;
 
-      if (stopMode === 'iterations') {
+      if (stopMode === 'iterations' || stopMode === 'both') {
         for (let k = 1; k <= iterations; k++) {
           let nextX_J = Array(size).fill(0);
           for (let i = 0; i < size; i++) {
@@ -98,6 +98,7 @@ const Calculadora = () => {
           jacobiSteps.push([...nextX_J]);
           jacobiErrors.push(l2);
           currentX_J = [...nextX_J];
+          if (stopMode === 'both' && l2 < tol) break;
         }
       } else {
         // tolerance-based stopping
@@ -130,7 +131,7 @@ const Calculadora = () => {
       const tol = Math.abs(parseFloat(tolerance) || 0);
       const maxIter = 1000;
 
-      if (stopMode === 'iterations') {
+      if (stopMode === 'iterations' || stopMode === 'both') {
         for (let k = 1; k <= iterations; k++) {
           let nextX_GS = [...currentX_GS];
           for (let i = 0; i < size; i++) {
@@ -150,6 +151,7 @@ const Calculadora = () => {
           gaussSeidelSteps.push([...nextX_GS]);
           gaussSeidelErrors.push(l2);
           currentX_GS = [...nextX_GS];
+          if (stopMode === 'both' && l2 < tol) break;
         }
       } else {
         // tolerance-based stopping
@@ -344,18 +346,23 @@ const Calculadora = () => {
           <select value={stopMode} onChange={(e) => setStopMode(e.target.value)} style={{marginLeft: '10px', padding: '5px'}}>
             <option value="iterations">Número de Iteraciones (k)</option>
             <option value="tolerance">Tolerancia</option>
+            <option value="both">Tolerancia o Número de Iteraciones (k)</option>
           </select>
         </label>
 
-        <label>
-          <strong>Número de Iteraciones (k):</strong>
-          <input type="number" min="1" max="100" value={iterations} onChange={(e) => setIterations(parseInt(e.target.value) || 1)} disabled={stopMode === 'tolerance'} style={{marginLeft: '10px', width: '80px', padding: '5px'}}/>
-        </label>
+        {(stopMode === 'iterations' || stopMode === 'both') && (
+          <label>
+            <strong>Número de Iteraciones (k):</strong>
+            <input type="number" min="1" max="100" value={iterations} onChange={(e) => setIterations(parseInt(e.target.value) || 1)} style={{marginLeft: '10px', width: '80px', padding: '5px'}}/>
+          </label>
+        )}
 
-        <label>
-          <strong>Tolerancia:</strong>
-          <input type="number" step="any" min="0" value={tolerance} onChange={(e) => setTolerance(parseFloat(e.target.value) || 0)} disabled={stopMode !== 'tolerance'} style={{marginLeft: '10px', width: '120px', padding: '5px'}}/>
-        </label>
+        {(stopMode === 'tolerance' || stopMode === 'both') && (
+          <label>
+            <strong>Tolerancia:</strong>
+            <input type="number" step="any" min="0" value={tolerance} onChange={(e) => setTolerance(parseFloat(e.target.value) || 0)} style={{marginLeft: '10px', width: '120px', padding: '5px'}}/>
+          </label>
+        )}
 
         <button onClick={solve} style={{ padding: '10px 20px', fontSize: '16px', fontWeight: 'bold' }}>Resolver Sistema</button>
       </div>
