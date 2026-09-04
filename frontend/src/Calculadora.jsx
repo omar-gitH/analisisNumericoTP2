@@ -7,6 +7,8 @@ const Calculadora = () => {
   const [B, setB] = useState(Array(3).fill(0));
   const [X0, setX0] = useState(Array(3).fill(0));
   const [iterations, setIterations] = useState(3);
+  const [stopMode, setStopMode] = useState('iterations'); // 'iterations' or 'tolerance'
+  const [tolerance, setTolerance] = useState(0.001);
   const [method, setMethod] = useState('ambos'); // 'ambos', 'jacobi', 'gauss'
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
@@ -60,6 +62,8 @@ const Calculadora = () => {
     
     let jacobiSteps = [];
     let gaussSeidelSteps = [];
+    let jacobiErrors = [];
+    let gaussSeidelErrors = [];
 
     // Verificamos división por cero antes de iterar
     for (let i = 0; i < size; i++) {
@@ -71,37 +75,105 @@ const Calculadora = () => {
 
     if (method === 'ambos' || method === 'jacobi') {
       let currentX_J = X0.map(val => parseFloat(val) || 0);
-      for (let k = 1; k <= iterations; k++) {
-        let nextX_J = Array(size).fill(0);
-        for (let i = 0; i < size; i++) {
-          let sum = parseFloat(B[i]) || 0;
-          for (let j = 0; j < size; j++) {
-            if (i !== j) {
-              sum -= (parseFloat(A[i][j]) || 0) * currentX_J[j];
+      const tol = Math.abs(parseFloat(tolerance) || 0);
+      const maxIter = 1000;
+
+      if (stopMode === 'iterations') {
+        for (let k = 1; k <= iterations; k++) {
+          let nextX_J = Array(size).fill(0);
+          for (let i = 0; i < size; i++) {
+            let sum = parseFloat(B[i]) || 0;
+            for (let j = 0; j < size; j++) {
+              if (i !== j) {
+                sum -= (parseFloat(A[i][j]) || 0) * currentX_J[j];
+              }
             }
+            nextX_J[i] = sum / (parseFloat(A[i][i]) || 0);
           }
-          nextX_J[i] = sum / (parseFloat(A[i][i]) || 0);
+          const sqDiffs = nextX_J.map((v, idx) => {
+            const d = (v - currentX_J[idx]) || 0;
+            return d * d;
+          });
+          const l2 = Math.sqrt(sqDiffs.reduce((s, x) => s + x, 0));
+          jacobiSteps.push([...nextX_J]);
+          jacobiErrors.push(l2);
+          currentX_J = [...nextX_J];
         }
-        jacobiSteps.push([...nextX_J]);
-        currentX_J = [...nextX_J];
+      } else {
+        // tolerance-based stopping
+        for (let k = 1; k <= maxIter; k++) {
+          let nextX_J = Array(size).fill(0);
+          for (let i = 0; i < size; i++) {
+            let sum = parseFloat(B[i]) || 0;
+            for (let j = 0; j < size; j++) {
+              if (i !== j) {
+                sum -= (parseFloat(A[i][j]) || 0) * currentX_J[j];
+              }
+            }
+            nextX_J[i] = sum / (parseFloat(A[i][i]) || 0);
+          }
+          const sqDiffs = nextX_J.map((v, idx) => {
+            const d = (v - currentX_J[idx]) || 0;
+            return d * d;
+          });
+          const l2 = Math.sqrt(sqDiffs.reduce((s, x) => s + x, 0));
+          jacobiSteps.push([...nextX_J]);
+          jacobiErrors.push(l2);
+          currentX_J = [...nextX_J];
+          if (l2 < tol) break;
+        }
       }
     }
 
     if (method === 'ambos' || method === 'gauss') {
       let currentX_GS = X0.map(val => parseFloat(val) || 0);
-      for (let k = 1; k <= iterations; k++) {
-        let nextX_GS = [...currentX_GS];
-        for (let i = 0; i < size; i++) {
-          let sum = parseFloat(B[i]) || 0;
-          for (let j = 0; j < size; j++) {
-            if (i !== j) {
-              sum -= (parseFloat(A[i][j]) || 0) * nextX_GS[j];
+      const tol = Math.abs(parseFloat(tolerance) || 0);
+      const maxIter = 1000;
+
+      if (stopMode === 'iterations') {
+        for (let k = 1; k <= iterations; k++) {
+          let nextX_GS = [...currentX_GS];
+          for (let i = 0; i < size; i++) {
+            let sum = parseFloat(B[i]) || 0;
+            for (let j = 0; j < size; j++) {
+              if (i !== j) {
+                sum -= (parseFloat(A[i][j]) || 0) * nextX_GS[j];
+              }
             }
+            nextX_GS[i] = sum / (parseFloat(A[i][i]) || 0);
           }
-          nextX_GS[i] = sum / (parseFloat(A[i][i]) || 0);
+          const sqDiffs = nextX_GS.map((v, idx) => {
+            const d = (v - currentX_GS[idx]) || 0;
+            return d * d;
+          });
+          const l2 = Math.sqrt(sqDiffs.reduce((s, x) => s + x, 0));
+          gaussSeidelSteps.push([...nextX_GS]);
+          gaussSeidelErrors.push(l2);
+          currentX_GS = [...nextX_GS];
         }
-        gaussSeidelSteps.push([...nextX_GS]);
-        currentX_GS = [...nextX_GS];
+      } else {
+        // tolerance-based stopping
+        for (let k = 1; k <= maxIter; k++) {
+          let nextX_GS = [...currentX_GS];
+          for (let i = 0; i < size; i++) {
+            let sum = parseFloat(B[i]) || 0;
+            for (let j = 0; j < size; j++) {
+              if (i !== j) {
+                sum -= (parseFloat(A[i][j]) || 0) * nextX_GS[j];
+              }
+            }
+            nextX_GS[i] = sum / (parseFloat(A[i][i]) || 0);
+          }
+          const sqDiffs = nextX_GS.map((v, idx) => {
+            const d = (v - currentX_GS[idx]) || 0;
+            return d * d;
+          });
+          const l2 = Math.sqrt(sqDiffs.reduce((s, x) => s + x, 0));
+          gaussSeidelSteps.push([...nextX_GS]);
+          gaussSeidelErrors.push(l2);
+          currentX_GS = [...nextX_GS];
+          if (l2 < tol) break;
+        }
       }
     }
 
@@ -109,6 +181,8 @@ const Calculadora = () => {
       isDominant,
       jacobiSteps,
       gaussSeidelSteps,
+      jacobiErrors,
+      gaussSeidelErrors,
       methodUsed: method
     });
   };
@@ -161,6 +235,9 @@ const Calculadora = () => {
     setB([4, -1, 4]);
     setX0([0, 0, 0]);
     setIterations(3);
+    setIterations(3);
+    setStopMode('iterations');
+    setTolerance(0.001);
     setMethod('ambos');
     setResults(null);
     setError('');
@@ -261,11 +338,25 @@ const Calculadora = () => {
         </div>
       </div>
 
-      <div className="solve-controls" style={{marginTop: '20px', padding: '15px', backgroundColor: '#e9ecef', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '20px'}}>
+      <div className="solve-controls" style={{marginTop: '20px', padding: '15px', backgroundColor: '#e9ecef', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap'}}>
+        <label>
+          <strong>Criterio de parada:</strong>
+          <select value={stopMode} onChange={(e) => setStopMode(e.target.value)} style={{marginLeft: '10px', padding: '5px'}}>
+            <option value="iterations">Número de Iteraciones (k)</option>
+            <option value="tolerance">Tolerancia</option>
+          </select>
+        </label>
+
         <label>
           <strong>Número de Iteraciones (k):</strong>
-          <input type="number" min="1" max="100" value={iterations} onChange={(e) => setIterations(parseInt(e.target.value) || 1)} style={{marginLeft: '10px', width: '80px', padding: '5px'}}/>
+          <input type="number" min="1" max="100" value={iterations} onChange={(e) => setIterations(parseInt(e.target.value) || 1)} disabled={stopMode === 'tolerance'} style={{marginLeft: '10px', width: '80px', padding: '5px'}}/>
         </label>
+
+        <label>
+          <strong>Tolerancia:</strong>
+          <input type="number" step="any" min="0" value={tolerance} onChange={(e) => setTolerance(parseFloat(e.target.value) || 0)} disabled={stopMode !== 'tolerance'} style={{marginLeft: '10px', width: '120px', padding: '5px'}}/>
+        </label>
+
         <button onClick={solve} style={{ padding: '10px 20px', fontSize: '16px', fontWeight: 'bold' }}>Resolver Sistema</button>
       </div>
 
@@ -297,6 +388,12 @@ const Calculadora = () => {
                     </div>
                   </div>
                 ))}
+                {results.jacobiErrors && results.jacobiErrors.length > 0 && (
+                  <div style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3f0', border: '1px solid #ffd6cc', borderRadius: '6px'}}>
+                    <strong>Error final (norma Euclídea):</strong>{' '}
+                    <code>{Number(results.jacobiErrors[results.jacobiErrors.length - 1]).toExponential(3)}</code>
+                  </div>
+                )}
               </div>
             )}
 
@@ -314,6 +411,12 @@ const Calculadora = () => {
                     </div>
                   </div>
                 ))}
+                {results.gaussSeidelErrors && results.gaussSeidelErrors.length > 0 && (
+                  <div style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3f0', border: '1px solid #ffd6cc', borderRadius: '6px'}}>
+                    <strong>Error final (norma Euclídea):</strong>{' '}
+                    <code>{Number(results.gaussSeidelErrors[results.gaussSeidelErrors.length - 1]).toExponential(3)}</code>
+                  </div>
+                )}
               </div>
             )}
             

@@ -1,6 +1,29 @@
 import React from 'react';
 
 const Teoria = () => {
+  const copyToClipboard = (text) => {
+    if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Prompt copiado al portapapeles');
+      }).catch(() => {
+        alert('No se pudo copiar el prompt');
+      });
+    } else {
+      try {
+        // Fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        alert('Prompt copiado al portapapeles');
+      } catch (e) {
+        alert('No se pudo copiar el prompt');
+      }
+    }
+  };
+
   return (
     <div className="teoria-container" style={{ padding: '10px 20px', lineHeight: '1.7', color: '#334155' }}>
       
@@ -66,6 +89,124 @@ const Teoria = () => {
       <p style={{ marginTop: '20px' }}>
         Al retroalimentar el sistema con la información más fresca al instante, Gauss-Seidel generalmente <strong>converge al resultado mucho más rápido</strong> y en menos iteraciones.
       </p>
+
+      <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '40px' }}>Concepto de Convergencia</h3>
+      <p>
+        Un método iterativo converge cuando la sucesión de vectores de aproximación {'$x^{(k)}$'} se acerca a la solución exacta $x$ del sistema conforme aumenta $k$. 
+        En la práctica se verifica que la diferencia entre iteraciones sucesivas decrece y tiende a cero bajo la norma elegida.
+      </p>
+
+      <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '30px' }}>Concepto de Error y Tolerancia</h3>
+      <p>
+        El <strong>error</strong> en una iteración se define como la discrepancia entre la aproximación actual y la anterior. Una forma habitual de medirlo es mediante la <strong>norma euclídea</strong> (L2):
+      </p>
+      <p style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+        {'$$\\|x^{(k)} - x^{(k-1)}\\|_2 = \\sqrt{\\sum_{i=1}^n (x^{(k)}_i - x^{(k-1)}_i)^2}$$'}
+      </p>
+      <p>
+        La <strong>tolerancia</strong> es un umbral pequeño que usamos para decidir que el error es suficientemente pequeño y podemos detener las iteraciones. Por ejemplo, si la norma euclídea es menor que la tolerancia elegida, se considera que el método ha convergido.
+      </p>
+
+      <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '30px' }}>Criterio de Parada</h3>
+      <p>
+        Los criterios de parada más comunes son:
+      </p>
+      <ul style={{ paddingLeft: '20px', color: '#475569' }}>
+        <li><strong>Máximo de iteraciones:</strong> detener tras un número prefijado de iteraciones.</li>
+        <li><strong>Tolerancia sobre la norma:</strong> detener cuando la norma euclídea de la diferencia entre iteraciones sea menor que la tolerancia (p. ej. ||x^(k)-x^(k-1)||_2 &lt; tolerancia).</li>
+        <li><strong>Combinado:</strong> detener cuando se cumple la tolerancia o se alcanza el máximo de iteraciones.</li>
+      </ul>
+
+      <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '30px' }}>Comparativa: Jacobi vs Gauss–Seidel</h3>
+      <div style={{ overflowX: 'auto', marginTop: '10px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+          <thead>
+            <tr style={{ background: '#f1f5f9' }}>
+              <th style={{ textAlign: 'left', padding: '10px', border: '1px solid #e2e8f0' }}>Característica</th>
+              <th style={{ textAlign: 'left', padding: '10px', border: '1px solid #e2e8f0' }}>Jacobi</th>
+              <th style={{ textAlign: 'left', padding: '10px', border: '1px solid #e2e8f0' }}>Gauss–Seidel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Actualización</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Simultánea: usa únicamente la iteración anterior</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Inmediata: usa valores nuevos dentro de la misma iteración</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Convergencia típica</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Más lenta; puede requerir más iteraciones</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Suele converger más rápido</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Paralelización</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Fácil de paralelizar (cada variable independiente)</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Menos paralelizable por dependencia en la misma iteración</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Uso práctico</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Útil cuando se dispone de recursos paralelos</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Preferido cuando se busca rapidez en pocas iteraciones</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Requisitos de la matriz</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Ambos requieren condiciones similares (e.g., diagonalmente dominante) para garantías de convergencia</td>
+              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style={{ borderTop: '2px solid #e2e8f0', paddingTop: '20px', color: '#0f172a', marginTop: '30px' }}>Bibliografía</h3>
+
+      <div style={{ display: 'grid', gap: '20px', marginTop: '15px' }}>
+        <div style={{ background: '#fff', border: '1px solid #e6eef8', padding: '15px', borderRadius: '8px' }}>
+          <h4 style={{ marginTop: 0 }}>Prompts para ChatGPT</h4>
+          <p style={{ margin: '8px 0' }}>Usa los botones "Copiar" para pegar el prompt en ChatGPT.</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div>
+              <strong>Prompt 1 — Fundamentos</strong>
+              <pre style={{ background: '#f8fafc', padding: '10px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
+"Explicame desde cero los métodos iterativos para resolver sistemas de ecuaciones lineales, enfocándote en los métodos de Jacobi y Gauss-Seidel. Explicá con lenguaje sencillo qué problema resuelven, qué significa una iteración, qué es un vector inicial, cómo se despejan las incógnitas y qué significa que un método converja. Utilizá ejemplos numéricos sencillos y explicá cada paso sin asumir conocimientos avanzados."
+              </pre>
+              <button onClick={() => copyToClipboard("Explicame desde cero los métodos iterativos para resolver sistemas de ecuaciones lineales, enfocándote en los métodos de Jacobi y Gauss-Seidel. Explicá con lenguaje sencillo qué problema resuelven, qué significa una iteración, qué es un vector inicial, cómo se despejan las incógnitas y qué significa que un método converja. Utilizá ejemplos numéricos sencillos y explicá cada paso sin asumir conocimientos avanzados.")}>Copiar Prompt 1</button>
+            </div>
+
+            <div>
+              <strong>Prompt 2 — Jacobi vs. Gauss-Seidel</strong>
+              <pre style={{ background: '#f8fafc', padding: '10px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
+"Explicame detalladamente el método de Jacobi y el método de Gauss-Seidel para resolver sistemas de ecuaciones lineales. Mostrá las fórmulas generales, explicá cómo se obtiene cada nueva aproximación y resolvé un mismo sistema mediante ambos métodos para poder compararlos. En particular, explicá claramente la diferencia entre utilizar valores de la iteración anterior (Jacobi) y utilizar inmediatamente los valores recién calculados (Gauss-Seidel). Incluí un ejemplo paso a paso."
+              </pre>
+              <button onClick={() => copyToClipboard("Explicame detalladamente el método de Jacobi y el método de Gauss-Seidel para resolver sistemas de ecuaciones lineales. Mostrá las fórmulas generales, explicá cómo se obtiene cada nueva aproximación y resolvé un mismo sistema mediante ambos métodos para poder compararlos. En particular, explicá claramente la diferencia entre utilizar valores de la iteración anterior (Jacobi) y utilizar inmediatamente los valores recién calculados (Gauss-Seidel). Incluí un ejemplo paso a paso.")}>Copiar Prompt 2</button>
+            </div>
+
+            <div>
+              <strong>Prompt 3 — Convergencia, error y criterio de parada</strong>
+              <pre style={{ background: '#f8fafc', padding: '10px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
+"Explicame cómo se determina si los métodos de Jacobi y Gauss-Seidel convergen y cuándo se deben detener las iteraciones. Explicá el concepto de matriz diagonalmente dominante y cómo verificarlo en un sistema de ecuaciones. Luego explicá los criterios de error absoluto, error relativo y norma de la diferencia entre dos vectores consecutivos, incluyendo la norma euclídea y la norma infinito o máxima diferencia. Mostrá ejemplos numéricos y explicá qué significa cada resultado y cómo se utiliza para decidir cuándo detener el método."
+              </pre>
+              <button onClick={() => copyToClipboard("Explicame cómo se determina si los métodos de Jacobi y Gauss-Seidel convergen y cuándo se deben detener las iteraciones. Explicá el concepto de matriz diagonalmente dominante y cómo verificarlo en un sistema de ecuaciones. Luego explicá los criterios de error absoluto, error relativo y norma de la diferencia entre dos vectores consecutivos, incluyendo la norma euclídea y la norma infinito o máxima diferencia. Mostrá ejemplos numéricos y explicá qué significa cada resultado y cómo se utiliza para decidir cuándo detener el método.")}>Copiar Prompt 3</button>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ background: '#fff', border: '1px solid #e6eef8', padding: '15px', borderRadius: '8px' }}>
+          <h4 style={{ marginTop: 0 }}>Apuntes de la cátedra (descargar)</h4>
+          <p>Descarga el material de la cátedra desde Google Drive:</p>
+          <a href="https://drive.google.com/drive/folders/1hsWmyCdzLgghACGVOFelK_XCbIPKI1Vm?usp=sharing" target="_blank" rel="noopener noreferrer">
+            <button>Abrir Apuntes (Google Drive)</button>
+          </a>
+        </div>
+
+        <div style={{ background: '#fff', border: '1px solid #e6eef8', padding: '15px', borderRadius: '8px' }}>
+          <h4 style={{ marginTop: 0 }}>Videos</h4>
+          <p>Ver videos relacionados en YouTube:</p>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <a href="https://www.youtube.com/watch?v=7Dqf9vird1w&list=PLa7M6OpJPy83bhLK-83Ti1gwh7ijh-b3D" target="_blank" rel="noopener noreferrer"><button>Playlist explicativa</button></a>
+            <a href="https://www.youtube.com/watch?v=iRdy1VgOTRk" target="_blank" rel="noopener noreferrer"><button>Video: Ejemplo práctico</button></a>
+          </div>
+        </div>
+      </div>
 
     </div>
   );
