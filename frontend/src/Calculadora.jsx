@@ -253,7 +253,7 @@ const Calculadora = () => {
           <span>💻</span> Calculadora Iterativa
         </h2>
         <p style={{ color: '#475569', margin: '0 0 15px 0' }}>
-          Configura y resuelve el sistema. <strong>¡Tip de usabilidad!</strong> Puedes desplazarte ágilmente por todas las celdas usando la tecla <code>Enter</code>. Al llegar a la última, el sistema se resolverá solo.
+          Configura y resuelve el sistema. 
         </p>
       </div>
       

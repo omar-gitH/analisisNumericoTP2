@@ -1,4 +1,4 @@
-import React from 'react';
+import Formula from './Formula';
 
 const Teoria = () => {
   const copyToClipboard = (text) => {
@@ -18,7 +18,7 @@ const Teoria = () => {
         document.execCommand('copy');
         document.body.removeChild(ta);
         alert('Prompt copiado al portapapeles');
-      } catch (e) {
+      } catch {
         alert('No se pudo copiar el prompt');
       }
     }
@@ -28,30 +28,32 @@ const Teoria = () => {
     <div className="teoria-container" style={{ padding: '10px 20px', lineHeight: '1.7', color: '#334155' }}>
       
       <p style={{ fontSize: '1.1rem', marginBottom: '30px' }}>
-        Los métodos iterativos son herramientas poderosas para resolver sistemas de ecuaciones lineales muy grandes. 
-        A diferencia de la eliminación gaussiana clásica que encuentra la solución exacta en un número finito de pasos, 
-        <strong>estos métodos parten de una conjetura inicial y la mejoran progresivamente</strong> hasta alcanzar un nivel de precisión deseado.
-      </p>
+        Los métodos iterativos buscan resolver un sistema de ecuaciones mediante aproximaciones sucesivas. 
+        <strong> Se comienza con una estimación inicial y, en cada iteración, se obtiene una aproximación mejor </strong> 
+        hasta que el resultado alcanza la precisión que necesitamos.
+        A diferencia de los <strong>métodos directos</strong>, 
+        que siguen un procedimiento definido para obtener la solución en una cantidad finita de pasos, 
+        los métodos iterativos refinan progresivamente una solución aproximada hasta alcanzar un resultado suficientemente preciso. 
+        </p>
 
       <div style={{ backgroundColor: '#f0f9ff', borderLeft: '4px solid #0ea5e9', padding: '15px 20px', borderRadius: '0 8px 8px 0', marginBottom: '30px' }}>
-        <h4 style={{ color: '#0369a1', marginTop: 0 }}>🧠 ¿Por qué usar métodos iterativos?</h4>
+        <h4 style={{ color: '#0369a1', marginTop: 0 }}> ¿Por qué usar métodos iterativos?</h4>
         <p style={{ margin: 0 }}>
           En el mundo real (como en simulaciones de fluidos o problemas de redes), las matrices suelen tener miles de ecuaciones pero están llenas de ceros (<strong>matrices dispersas</strong>). 
           Los métodos iterativos como Jacobi y Gauss-Seidel son ideales porque no modifican la matriz original y ahorran muchísima memoria RAM.
         </p>
       </div>
 
-      <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a' }}>1. La Condición de Oro: Matriz Diagonalmente Dominante</h3>
-      <p>
-        Para que un método iterativo funcione y no se aleje de la respuesta correcta (divergencia), necesitamos que la matriz del sistema esté bien balanceada. 
-        Esto se garantiza cuando la matriz es <strong>diagonalmente dominante</strong>.
+      <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a' }}>1. Matriz Diagonalmente Dominante</h3>
+      <p> Para que un método iterativo converja hacia la solución del sistema y no se aleje de ella (divergencia), 
+        es importante que la matriz del sistema cumpla ciertas condiciones. Una de las más utilizadas es que la matriz sea
+        <strong> diagonalmente dominante</strong>, es decir, que en cada fila el valor absoluto del elemento de la diagonal principal 
+        sea mayor que la suma de los valores absolutos de los demás elementos de esa fila. 
       </p>
       
       <div style={{ background: '#fff', border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', textAlign: 'center', margin: '20px 0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
         <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#475569' }}>Fórmula de Dominancia Diagonal por Filas</p>
-        <code style={{ fontSize: '1.2rem', color: '#1d4ed8', background: '#eff6ff', padding: '5px 15px', borderRadius: '6px' }}>
-          |a<sub>ii</sub>| &ge; &sum; |a<sub>ij</sub>| &nbsp;&nbsp;<span style={{ fontSize: '0.9rem', color: '#64748b' }}>(para j &ne; i)</span>
-        </code>
+        <Formula display>{String.raw`|a_{ii}| \geq \sum_{j \neq i} |a_{ij}|`}</Formula>
         <p style={{ margin: '15px 0 0 0', fontSize: '0.95rem' }}>
           <strong>En lenguaje simple:</strong> El número que está en la diagonal de una fila debe ser más "pesado" (en valor absoluto) que la suma de todos los demás números de esa misma fila juntos.
         </p>
@@ -63,46 +65,49 @@ const Teoria = () => {
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '40px' }}>2. El Método de Jacobi (Actualización Simultánea)</h3>
       <p>
-        En el método de Jacobi, se despeja la variable principal de cada ecuación. Durante cada iteración, se calcula un <strong>nuevo conjunto de valores</strong> 
+        En el método de Jacobi, se despeja la variable principal de cada ecuación. Durante cada iteración, se calcula un <strong>nuevo conjunto de valores </strong> 
         utilizando exclusivamente los valores de la <strong>iteración anterior</strong>.
       </p>
       <ul style={{ paddingLeft: '20px', color: '#475569' }}>
-        <li>💡 <strong>Ventaja:</strong> Es extremadamente fácil de paralelizar en computadoras modernas (usando placas de video / GPUs), ya que el cálculo de cada variable no depende de las demás en la misma iteración.</li>
-        <li>🐢 <strong>Desventaja:</strong> Suele converger más lento que otros métodos.</li>
+        <li><strong>Ventaja:</strong> Es extremadamente fácil de paralelizar en computadoras modernas (usando placas de video / GPUs),
+         ya que el cálculo de cada variable no depende de las demás en la misma iteración.</li>
+        <li><strong>Desventaja:</strong> Suele converger más lento que otros métodos.</li>
       </ul>
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '40px' }}>3. El Método de Gauss-Seidel (Actualización Sucesiva)</h3>
       <p>
-        Gauss-Seidel es una mejora directa e inteligente sobre Jacobi. En lugar de esperar a que termine toda la ronda para actualizar los valores, 
-        <strong>Gauss-Seidel usa los valores nuevos inmediatamente</strong> apenas son calculados.
+        Gauss-Seidel es una variante del método de Jacobi que utiliza los valores actualizados durante la misma iteración. En lugar de esperar a que termine toda la ronda para actualizar los valores, 
+        <strong> Gauss-Seidel usa los valores nuevos inmediatamente</strong> apenas son calculados.
       </p>
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '20px' }}>
         <div style={{ flex: 1, background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
           <strong>Cómo piensa Jacobi:</strong><br/>
-          "Calculo <code>y</code> usando la <code>x</code> vieja."
+          "Calculo cada variable usando únicamente los valores de la iteración anterior"
         </div>
         <div style={{ flex: 1, background: '#f0fdf4', padding: '15px', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
           <strong>Cómo piensa Gauss-Seidel:</strong><br/>
-          "Como ya acabo de calcular una nueva <code>x</code> que es más exacta, voy a usarla ya mismo para calcular <code>y</code>."
+          "Como ya acabo de calcular una nueva variable que es más exacta, voy a usarla inmediatamente para calcular la otra variable."
         </div>
       </div>
       <p style={{ marginTop: '20px' }}>
-        Al retroalimentar el sistema con la información más fresca al instante, Gauss-Seidel generalmente <strong>converge al resultado mucho más rápido</strong> y en menos iteraciones.
+        Al retroalimentar el sistema con la información más fresca al instante, Gauss-Seidel generalmente 
+        <strong> alcanza la convergencia en menos iteraciones que Jacobi</strong>.
       </p>
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '40px' }}>Concepto de Convergencia</h3>
       <p>
-        Un método iterativo converge cuando la sucesión de vectores de aproximación {'$x^{(k)}$'} se acerca a la solución exacta $x$ del sistema conforme aumenta $k$. 
+        Un método iterativo converge cuando la sucesión de vectores de aproximación <Formula>{String.raw`x^{(k)}`}</Formula> se acerca a la solución exacta <Formula>x</Formula> del sistema conforme aumenta <Formula>k</Formula>.
         En la práctica se verifica que la diferencia entre iteraciones sucesivas decrece y tiende a cero bajo la norma elegida.
       </p>
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '30px' }}>Concepto de Error y Tolerancia</h3>
       <p>
-        El <strong>error</strong> en una iteración se define como la discrepancia entre la aproximación actual y la anterior. Una forma habitual de medirlo es mediante la <strong>norma euclídea</strong> (L2):
+        En los métodos iterativos, el <strong>error verdadero</strong> sería la diferencia entre la aproximación obtenida y la solución exacta. 
+        Como normalmente no conocemos esa solución, en la práctica utilizamos la <strong>diferencia entre dos iteraciones sucesivas</strong> como una medida del cambio producido:
       </p>
-      <p style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-        {'$$\\|x^{(k)} - x^{(k-1)}\\|_2 = \\sqrt{\\sum_{i=1}^n (x^{(k)}_i - x^{(k-1)}_i)^2}$$'}
-      </p>
+      <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+        <Formula display>{String.raw`\lVert x^{(k)} - x^{(k-1)} \rVert_2 = \sqrt{\sum_{i=1}^{n} \left(x_i^{(k)} - x_i^{(k-1)}\right)^2}`}</Formula>
+      </div>
       <p>
         La <strong>tolerancia</strong> es un umbral pequeño que usamos para decidir que el error es suficientemente pequeño y podemos detener las iteraciones. Por ejemplo, si la norma euclídea es menor que la tolerancia elegida, se considera que el método ha convergido.
       </p>
@@ -113,7 +118,7 @@ const Teoria = () => {
       </p>
       <ul style={{ paddingLeft: '20px', color: '#475569' }}>
         <li><strong>Máximo de iteraciones:</strong> detener tras un número prefijado de iteraciones.</li>
-        <li><strong>Tolerancia sobre la norma:</strong> detener cuando la norma euclídea de la diferencia entre iteraciones sea menor que la tolerancia (p. ej. ||x^(k)-x^(k-1)||_2 &lt; tolerancia).</li>
+        <li><strong>Tolerancia sobre la norma:</strong> detener cuando la norma euclídea de la diferencia entre iteraciones sea menor que la tolerancia (p. ej. <Formula>{String.raw`\lVert x^{(k)} - x^{(k-1)} \rVert_2 < \text{tolerancia}`}</Formula>).</li>
         <li><strong>Combinado:</strong> detener cuando se cumple la tolerancia o se alcanza el máximo de iteraciones.</li>
       </ul>
 
@@ -148,16 +153,11 @@ const Teoria = () => {
               <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Útil cuando se dispone de recursos paralelos</td>
               <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Preferido cuando se busca rapidez en pocas iteraciones</td>
             </tr>
-            <tr>
-              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Requisitos de la matriz</td>
-              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>Ambos requieren condiciones similares (e.g., diagonalmente dominante) para garantías de convergencia</td>
-              <td style={{ padding: '10px', border: '1px solid #e2e8f0' }}>—</td>
-            </tr>
           </tbody>
         </table>
       </div>
 
-      <h3 style={{ borderTop: '2px solid #e2e8f0', paddingTop: '20px', color: '#0f172a', marginTop: '30px' }}>Bibliografía</h3>
+      <h3 style={{ borderTop: '2px solid #e2e8f0', paddingTop: '20px', color: '#0f172a', marginTop: '30px' }}>Bibliografía para aprender y estudiar</h3>
 
       <div style={{ display: 'grid', gap: '20px', marginTop: '15px' }}>
         <div style={{ background: '#fff', border: '1px solid #e6eef8', padding: '15px', borderRadius: '8px' }}>

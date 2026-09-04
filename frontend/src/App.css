@@ -1,12 +1,15 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
+  align-items: stretch;
   background: linear-gradient(135deg, #f4f7ff 0%, #edf2ff 100%);
   color: #1f2937;
+  overflow-x: clip;
 }
 
 .sidebar {
-  width: 240px;
+  flex: 0 1 clamp(190px, 22vw, 260px);
+  min-width: 0;
   background: #0f172a;
   color: #e2e8f0;
   padding: 2rem 1.25rem;
@@ -14,6 +17,7 @@
   position: sticky;
   top: 0;
   height: 100vh;
+  align-self: flex-start;
   overflow-y: auto;
 }
 
@@ -71,18 +75,34 @@
 }
 
 .main-content {
-  flex: 1;
-  padding: 2rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 0;
+  padding: clamp(1rem, 3vw, 2rem);
   display: grid;
   gap: 1.5rem;
 }
 
 .section-card {
+  min-width: 0;
   background: rgba(255, 255, 255, 0.8);
   border: 1px solid rgba(148, 163, 184, 0.25);
   border-radius: 18px;
   padding: 1.75rem 2rem;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+}
+
+.formula-block {
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.75rem 0.5rem;
+  color: #1d4ed8;
+  font-size: clamp(1rem, 2.5vw, 1.2rem);
+}
+
+.formula-block .katex-display {
+  margin: 0;
+  min-width: max-content;
 }
 
 .section-tag {
@@ -118,9 +138,70 @@
 
   .sidebar {
     width: 100%;
+    flex-basis: auto;
+    height: auto;
+    max-height: none;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    z-index: 10;
+  }
+
+  .brand {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 0.25rem 0.5rem;
+    border-bottom: 0;
+    margin-bottom: 0;
+  }
+
+  .brand > div:last-child {
+    min-width: 0;
+  }
+
+  .brand strong,
+  .brand small {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-menu {
+    flex: 1 1 auto;
+    min-width: 0;
+    flex-direction: row;
+    gap: 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+  }
+
+  .nav-link {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .main-content {
     padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .brand {
+    padding-inline: 0;
+  }
+
+  .nav-menu {
+    flex: 0 0 auto;
+  }
+
+  .nav-link {
+    padding: 0.65rem 0.8rem;
   }
 }
