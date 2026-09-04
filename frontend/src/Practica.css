@@ -20,53 +20,65 @@
 }
 
 input[type="text"], input[type="number"], select {
-  padding: 8px;
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
+  padding: 10px 14px;
+  border: 2px solid transparent;
+  border-radius: 10px;
   font-family: inherit;
   font-size: 1rem;
-  color: #334155;
-  transition: all 0.2s ease;
-  background-color: #fff;
+  color: var(--text-primary);
+  background-color: rgba(15, 23, 42, 0.03);
+  transition: var(--transition-normal);
 }
 
 input[type="text"]:focus, input[type="number"]:focus, select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  border-color: var(--primary-color);
+  background-color: white;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
 }
 
-input[type="text"]:hover, input[type="number"]:hover, select:hover {
-  border-color: #94a3b8;
+input[type="text"]:hover:not(:focus), input[type="number"]:hover:not(:focus), select:hover:not(:focus) {
+  background-color: rgba(15, 23, 42, 0.06);
 }
 
 button {
-  background-color: #3b82f6;
+  background: var(--primary-gradient);
   color: white;
   border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
+  padding: 12px 24px;
+  border-radius: 12px;
   cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+  font-weight: 700;
+  font-size: 1rem;
+  transition: var(--transition-bounce);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  position: relative;
+  overflow: hidden;
 }
 
 button:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
 }
 
 button:active {
-  transform: translateY(0);
+  transform: scale(0.96) translateY(0);
+  box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
 }
 
 .error-message {
   margin: 15px 0;
-  padding: 12px 15px;
-  background-color: #fef2f2;
+  padding: 14px 18px;
+  background-color: rgba(239, 68, 68, 0.1);
   border-left: 4px solid #ef4444;
-  color: #991b1b;
-  border-radius: 0 6px 6px 0;
+  color: #b91c1c;
+  border-radius: 8px;
+  font-weight: 600;
+  animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
 }

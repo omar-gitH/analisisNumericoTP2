@@ -5,11 +5,13 @@ function Formula({ children, display = false }) {
   const math = String(children).trim();
 
   return display ? (
-    <div className="formula-block" aria-label="Fórmula matemática">
+    <div className="formula-block notranslate" aria-label="Fórmula matemática" translate="no">
       <BlockMath math={math} />
     </div>
   ) : (
-    <InlineMath math={math} />
+    <span className="notranslate" translate="no">
+      <InlineMath math={math} />
+    </span>
   );
 }
 

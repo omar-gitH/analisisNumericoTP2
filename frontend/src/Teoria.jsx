@@ -26,34 +26,36 @@ const Teoria = () => {
 
   return (
     <div className="teoria-container" style={{ padding: '10px 20px', lineHeight: '1.7', color: '#334155' }}>
-      
+
       <p style={{ fontSize: '1.1rem', marginBottom: '30px' }}>
-        Los métodos iterativos buscan resolver un sistema de ecuaciones mediante aproximaciones sucesivas. 
-        <strong> Se comienza con una estimación inicial y, en cada iteración, se obtiene una aproximación mejor </strong> 
+        Los métodos iterativos buscan resolver un sistema de ecuaciones mediante aproximaciones sucesivas.
+        <strong> Se comienza con una estimación inicial y, en cada iteración, se obtiene una aproximación mejor </strong>
         hasta que el resultado alcanza la precisión que necesitamos.
-        A diferencia de los <strong>métodos directos</strong>, 
-        que siguen un procedimiento definido para obtener la solución en una cantidad finita de pasos, 
-        los métodos iterativos refinan progresivamente una solución aproximada hasta alcanzar un resultado suficientemente preciso. 
-        </p>
+        A diferencia de los <strong>métodos directos</strong>,
+        que siguen un procedimiento definido para obtener la solución en una cantidad finita de pasos,
+        los métodos iterativos refinan progresivamente una solución aproximada hasta alcanzar un resultado suficientemente preciso.
+      </p>
 
       <div style={{ backgroundColor: '#f0f9ff', borderLeft: '4px solid #0ea5e9', padding: '15px 20px', borderRadius: '0 8px 8px 0', marginBottom: '30px' }}>
         <h4 style={{ color: '#0369a1', marginTop: 0 }}> ¿Por qué usar métodos iterativos?</h4>
         <p style={{ margin: 0 }}>
-          En el mundo real (como en simulaciones de fluidos o problemas de redes), las matrices suelen tener miles de ecuaciones pero están llenas de ceros (<strong>matrices dispersas</strong>). 
+          En el mundo real (como en simulaciones de fluidos o problemas de redes), las matrices suelen tener miles de ecuaciones pero están llenas de ceros (<strong>matrices dispersas</strong>).
           Los métodos iterativos como Jacobi y Gauss-Seidel son ideales porque no modifican la matriz original y ahorran muchísima memoria RAM.
         </p>
       </div>
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a' }}>1. Matriz Diagonalmente Dominante</h3>
-      <p> Para que un método iterativo converja hacia la solución del sistema y no se aleje de ella (divergencia), 
+      <p> Para que un método iterativo converja hacia la solución del sistema y no se aleje de ella (divergencia),
         es importante que la matriz del sistema cumpla ciertas condiciones. Una de las más utilizadas es que la matriz sea
-        <strong> diagonalmente dominante</strong>, es decir, que en cada fila el valor absoluto del elemento de la diagonal principal 
-        sea mayor que la suma de los valores absolutos de los demás elementos de esa fila. 
+        <strong> diagonalmente dominante</strong>, es decir, que en cada fila el valor absoluto del elemento de la diagonal principal
+        sea mayor que la suma de los valores absolutos de los demás elementos de esa fila.
       </p>
-      
+
       <div style={{ background: '#fff', border: '1px solid #cbd5e1', padding: '20px', borderRadius: '12px', textAlign: 'center', margin: '20px 0', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
         <p style={{ margin: '0 0 10px 0', fontWeight: 'bold', color: '#475569' }}>Fórmula de Dominancia Diagonal por Filas</p>
-        <Formula display>{String.raw`|a_{ii}| \geq \sum_{j \neq i} |a_{ij}|`}</Formula>
+        <Formula display>
+          {String.raw`|a_{ii}| > \sum_{\substack{j=1 \\ j \neq i}}^{n} |a_{ij}|`}
+        </Formula>
         <p style={{ margin: '15px 0 0 0', fontSize: '0.95rem' }}>
           <strong>En lenguaje simple:</strong> El número que está en la diagonal de una fila debe ser más "pesado" (en valor absoluto) que la suma de todos los demás números de esa misma fila juntos.
         </p>
@@ -65,32 +67,32 @@ const Teoria = () => {
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '40px' }}>2. El Método de Jacobi (Actualización Simultánea)</h3>
       <p>
-        En el método de Jacobi, se despeja la variable principal de cada ecuación. Durante cada iteración, se calcula un <strong>nuevo conjunto de valores </strong> 
+        En el método de Jacobi, se despeja la variable principal de cada ecuación. Durante cada iteración, se calcula un <strong>nuevo conjunto de valores </strong>
         utilizando exclusivamente los valores de la <strong>iteración anterior</strong>.
       </p>
       <ul style={{ paddingLeft: '20px', color: '#475569' }}>
         <li><strong>Ventaja:</strong> Es extremadamente fácil de paralelizar en computadoras modernas (usando placas de video / GPUs),
-         ya que el cálculo de cada variable no depende de las demás en la misma iteración.</li>
+          ya que el cálculo de cada variable no depende de las demás en la misma iteración.</li>
         <li><strong>Desventaja:</strong> Suele converger más lento que otros métodos.</li>
       </ul>
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '40px' }}>3. El Método de Gauss-Seidel (Actualización Sucesiva)</h3>
       <p>
-        Gauss-Seidel es una variante del método de Jacobi que utiliza los valores actualizados durante la misma iteración. En lugar de esperar a que termine toda la ronda para actualizar los valores, 
+        Gauss-Seidel es una variante del método de Jacobi que utiliza los valores actualizados durante la misma iteración. En lugar de esperar a que termine toda la ronda para actualizar los valores,
         <strong> Gauss-Seidel usa los valores nuevos inmediatamente</strong> apenas son calculados.
       </p>
       <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginTop: '20px' }}>
         <div style={{ flex: 1, background: '#f8fafc', padding: '15px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-          <strong>Cómo piensa Jacobi:</strong><br/>
+          <strong>Cómo piensa Jacobi:</strong><br />
           "Calculo cada variable usando únicamente los valores de la iteración anterior"
         </div>
         <div style={{ flex: 1, background: '#f0fdf4', padding: '15px', borderRadius: '8px', border: '1px solid #bbf7d0' }}>
-          <strong>Cómo piensa Gauss-Seidel:</strong><br/>
+          <strong>Cómo piensa Gauss-Seidel:</strong><br />
           "Como ya acabo de calcular una nueva variable que es más exacta, voy a usarla inmediatamente para calcular la otra variable."
         </div>
       </div>
       <p style={{ marginTop: '20px' }}>
-        Al retroalimentar el sistema con la información más fresca al instante, Gauss-Seidel generalmente 
+        Al retroalimentar el sistema con la información más fresca al instante, Gauss-Seidel generalmente
         <strong> alcanza la convergencia en menos iteraciones que Jacobi</strong>.
       </p>
 
@@ -102,7 +104,7 @@ const Teoria = () => {
 
       <h3 style={{ borderBottom: '2px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', marginTop: '30px' }}>Concepto de Error y Tolerancia</h3>
       <p>
-        En los métodos iterativos, el <strong>error verdadero</strong> sería la diferencia entre la aproximación obtenida y la solución exacta. 
+        En los métodos iterativos, el <strong>error verdadero</strong> sería la diferencia entre la aproximación obtenida y la solución exacta.
         Como normalmente no conocemos esa solución, en la práctica utilizamos la <strong>diferencia entre dos iteraciones sucesivas</strong> como una medida del cambio producido:
       </p>
       <div style={{ background: '#f8fafc', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
@@ -167,7 +169,7 @@ const Teoria = () => {
             <div>
               <strong>Prompt 1 — Fundamentos</strong>
               <pre style={{ background: '#f8fafc', padding: '10px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
-"Explicame desde cero los métodos iterativos para resolver sistemas de ecuaciones lineales, enfocándote en los métodos de Jacobi y Gauss-Seidel. Explicá con lenguaje sencillo qué problema resuelven, qué significa una iteración, qué es un vector inicial, cómo se despejan las incógnitas y qué significa que un método converja. Utilizá ejemplos numéricos sencillos y explicá cada paso sin asumir conocimientos avanzados."
+                "Explicame desde cero los métodos iterativos para resolver sistemas de ecuaciones lineales, enfocándote en los métodos de Jacobi y Gauss-Seidel. Explicá con lenguaje sencillo qué problema resuelven, qué significa una iteración, qué es un vector inicial, cómo se despejan las incógnitas y qué significa que un método converja. Utilizá ejemplos numéricos sencillos y explicá cada paso sin asumir conocimientos avanzados."
               </pre>
               <button onClick={() => copyToClipboard("Explicame desde cero los métodos iterativos para resolver sistemas de ecuaciones lineales, enfocándote en los métodos de Jacobi y Gauss-Seidel. Explicá con lenguaje sencillo qué problema resuelven, qué significa una iteración, qué es un vector inicial, cómo se despejan las incógnitas y qué significa que un método converja. Utilizá ejemplos numéricos sencillos y explicá cada paso sin asumir conocimientos avanzados.")}>Copiar Prompt 1</button>
             </div>
@@ -175,7 +177,7 @@ const Teoria = () => {
             <div>
               <strong>Prompt 2 — Jacobi vs. Gauss-Seidel</strong>
               <pre style={{ background: '#f8fafc', padding: '10px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
-"Explicame detalladamente el método de Jacobi y el método de Gauss-Seidel para resolver sistemas de ecuaciones lineales. Mostrá las fórmulas generales, explicá cómo se obtiene cada nueva aproximación y resolvé un mismo sistema mediante ambos métodos para poder compararlos. En particular, explicá claramente la diferencia entre utilizar valores de la iteración anterior (Jacobi) y utilizar inmediatamente los valores recién calculados (Gauss-Seidel). Incluí un ejemplo paso a paso."
+                "Explicame detalladamente el método de Jacobi y el método de Gauss-Seidel para resolver sistemas de ecuaciones lineales. Mostrá las fórmulas generales, explicá cómo se obtiene cada nueva aproximación y resolvé un mismo sistema mediante ambos métodos para poder compararlos. En particular, explicá claramente la diferencia entre utilizar valores de la iteración anterior (Jacobi) y utilizar inmediatamente los valores recién calculados (Gauss-Seidel). Incluí un ejemplo paso a paso."
               </pre>
               <button onClick={() => copyToClipboard("Explicame detalladamente el método de Jacobi y el método de Gauss-Seidel para resolver sistemas de ecuaciones lineales. Mostrá las fórmulas generales, explicá cómo se obtiene cada nueva aproximación y resolvé un mismo sistema mediante ambos métodos para poder compararlos. En particular, explicá claramente la diferencia entre utilizar valores de la iteración anterior (Jacobi) y utilizar inmediatamente los valores recién calculados (Gauss-Seidel). Incluí un ejemplo paso a paso.")}>Copiar Prompt 2</button>
             </div>
@@ -183,7 +185,7 @@ const Teoria = () => {
             <div>
               <strong>Prompt 3 — Convergencia, error y criterio de parada</strong>
               <pre style={{ background: '#f8fafc', padding: '10px', borderRadius: '6px', whiteSpace: 'pre-wrap' }}>
-"Explicame cómo se determina si los métodos de Jacobi y Gauss-Seidel convergen y cuándo se deben detener las iteraciones. Explicá el concepto de matriz diagonalmente dominante y cómo verificarlo en un sistema de ecuaciones. Luego explicá los criterios de error absoluto, error relativo y norma de la diferencia entre dos vectores consecutivos, incluyendo la norma euclídea y la norma infinito o máxima diferencia. Mostrá ejemplos numéricos y explicá qué significa cada resultado y cómo se utiliza para decidir cuándo detener el método."
+                "Explicame cómo se determina si los métodos de Jacobi y Gauss-Seidel convergen y cuándo se deben detener las iteraciones. Explicá el concepto de matriz diagonalmente dominante y cómo verificarlo en un sistema de ecuaciones. Luego explicá los criterios de error absoluto, error relativo y norma de la diferencia entre dos vectores consecutivos, incluyendo la norma euclídea y la norma infinito o máxima diferencia. Mostrá ejemplos numéricos y explicá qué significa cada resultado y cómo se utiliza para decidir cuándo detener el método."
               </pre>
               <button onClick={() => copyToClipboard("Explicame cómo se determina si los métodos de Jacobi y Gauss-Seidel convergen y cuándo se deben detener las iteraciones. Explicá el concepto de matriz diagonalmente dominante y cómo verificarlo en un sistema de ecuaciones. Luego explicá los criterios de error absoluto, error relativo y norma de la diferencia entre dos vectores consecutivos, incluyendo la norma euclídea y la norma infinito o máxima diferencia. Mostrá ejemplos numéricos y explicá qué significa cada resultado y cómo se utiliza para decidir cuándo detener el método.")}>Copiar Prompt 3</button>
             </div>
