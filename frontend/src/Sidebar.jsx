@@ -42,10 +42,17 @@ function Sidebar() {
         >
           🧮 Calculadora
         </a>
+
+        <a 
+          className={`nav-link ${seccionActiva === 'quiz' ? 'active' : ''}`} 
+          href="#quiz"
+          onClick={() => manejarClic('quiz')}
+        >
+          🎯 Quiz
+        </a>
       </div>
     </nav>
   );
 }
 
 export default Sidebar;
-

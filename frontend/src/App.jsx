@@ -3,6 +3,7 @@ import Sidebar from './Sidebar';
 import Teoria from './Teoria';
 import Practica from './Practica';
 import Calculadora from './Calculadora';
+import Quiz from './Quiz';
 
 function App() {
   return (
@@ -23,6 +24,11 @@ function App() {
         <section id="calculadora" className="section-card">
           <span className="section-tag">Calculadora</span>
           <Calculadora />
+        </section>
+
+        <section id="quiz" className="section-card">
+          <span className="section-tag">Quiz</span>
+          <Quiz />
         </section>
       </main>
     </div>
