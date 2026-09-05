@@ -14,9 +14,10 @@ const Calculadora = () => {
   const [error, setError] = useState('');
 
   const handleSizeChange = (e) => {
-    const newSize = parseInt(e.target.value);
+    const val = e.target.value;
+    setSize(val); // Permite que el input quede vacío visualmente ("")
+    const newSize = parseInt(val);
     if (newSize >= 2 && newSize <= 5) {
-      setSize(newSize);
       setA(Array(newSize).fill(0).map(() => Array(newSize).fill(0)));
       setB(Array(newSize).fill(0));
       setX0(Array(newSize).fill(0));
@@ -25,28 +26,39 @@ const Calculadora = () => {
     }
   };
 
+  const sanitizeInteger = (val) => {
+    if (val === undefined || val === null) return '';
+    const str = String(val);
+    // Keep only digits and minus sign
+    let cleaned = str.replace(/[^0-9-]/g, '');
+    // Keep minus sign ONLY at the beginning
+    cleaned = cleaned.replace(/(?!^)-/g, '');
+    return cleaned;
+  };
+
   const updateA = (row, col, value) => {
     const newA = [...A];
-    newA[row][col] = value;
+    newA[row][col] = sanitizeInteger(value);
     setA(newA);
   };
 
   const updateB = (row, value) => {
     const newB = [...B];
-    newB[row] = value;
+    newB[row] = sanitizeInteger(value);
     setB(newB);
   };
 
   const updateX0 = (row, value) => {
     const newX0 = [...X0];
-    newX0[row] = value;
+    newX0[row] = sanitizeInteger(value);
     setX0(newX0);
   };
 
   const checkDiagonalDominance = () => {
-    for (let i = 0; i < size; i++) {
+    const effSize = parseInt(size) || A.length;
+    for (let i = 0; i < effSize; i++) {
       let sum = 0;
-      for (let j = 0; j < size; j++) {
+      for (let j = 0; j < effSize; j++) {
         if (i !== j) sum += Math.abs(parseFloat(A[i][j]) || 0);
       }
       if (Math.abs(parseFloat(A[i][i]) || 0) < sum) {
@@ -58,6 +70,12 @@ const Calculadora = () => {
 
   const solve = () => {
     setError('');
+    
+    // Parseamos variables de estado que podrían ser strings vacíos
+    const effSize = parseInt(size) || A.length;
+    const effIterations = parseInt(iterations) || 1;
+    const tol = Math.abs(parseFloat(tolerance) || 0);
+
     const isDominant = checkDiagonalDominance();
     
     let jacobiSteps = [];
@@ -66,7 +84,7 @@ const Calculadora = () => {
     let gaussSeidelErrors = [];
 
     // Verificamos división por cero antes de iterar
-    for (let i = 0; i < size; i++) {
+    for (let i = 0; i < effSize; i++) {
       if ((parseFloat(A[i][i]) || 0) === 0) {
         setError('Error: Un elemento en la diagonal principal es cero. Reordena las filas para evitar la división por cero.');
         return;
@@ -75,15 +93,14 @@ const Calculadora = () => {
 
     if (method === 'ambos' || method === 'jacobi') {
       let currentX_J = X0.map(val => parseFloat(val) || 0);
-      const tol = Math.abs(parseFloat(tolerance) || 0);
       const maxIter = 1000;
 
       if (stopMode === 'iterations' || stopMode === 'both') {
-        for (let k = 1; k <= iterations; k++) {
-          let nextX_J = Array(size).fill(0);
-          for (let i = 0; i < size; i++) {
+        for (let k = 1; k <= effIterations; k++) {
+          let nextX_J = Array(effSize).fill(0);
+          for (let i = 0; i < effSize; i++) {
             let sum = parseFloat(B[i]) || 0;
-            for (let j = 0; j < size; j++) {
+            for (let j = 0; j < effSize; j++) {
               if (i !== j) {
                 sum -= (parseFloat(A[i][j]) || 0) * currentX_J[j];
               }
@@ -103,10 +120,10 @@ const Calculadora = () => {
       } else {
         // tolerance-based stopping
         for (let k = 1; k <= maxIter; k++) {
-          let nextX_J = Array(size).fill(0);
-          for (let i = 0; i < size; i++) {
+          let nextX_J = Array(effSize).fill(0);
+          for (let i = 0; i < effSize; i++) {
             let sum = parseFloat(B[i]) || 0;
-            for (let j = 0; j < size; j++) {
+            for (let j = 0; j < effSize; j++) {
               if (i !== j) {
                 sum -= (parseFloat(A[i][j]) || 0) * currentX_J[j];
               }
@@ -128,15 +145,14 @@ const Calculadora = () => {
 
     if (method === 'ambos' || method === 'gauss') {
       let currentX_GS = X0.map(val => parseFloat(val) || 0);
-      const tol = Math.abs(parseFloat(tolerance) || 0);
       const maxIter = 1000;
 
       if (stopMode === 'iterations' || stopMode === 'both') {
-        for (let k = 1; k <= iterations; k++) {
+        for (let k = 1; k <= effIterations; k++) {
           let nextX_GS = [...currentX_GS];
-          for (let i = 0; i < size; i++) {
+          for (let i = 0; i < effSize; i++) {
             let sum = parseFloat(B[i]) || 0;
-            for (let j = 0; j < size; j++) {
+            for (let j = 0; j < effSize; j++) {
               if (i !== j) {
                 sum -= (parseFloat(A[i][j]) || 0) * nextX_GS[j];
               }
@@ -157,9 +173,9 @@ const Calculadora = () => {
         // tolerance-based stopping
         for (let k = 1; k <= maxIter; k++) {
           let nextX_GS = [...currentX_GS];
-          for (let i = 0; i < size; i++) {
+          for (let i = 0; i < effSize; i++) {
             let sum = parseFloat(B[i]) || 0;
-            for (let j = 0; j < size; j++) {
+            for (let j = 0; j < effSize; j++) {
               if (i !== j) {
                 sum -= (parseFloat(A[i][j]) || 0) * nextX_GS[j];
               }
@@ -190,6 +206,12 @@ const Calculadora = () => {
   };
 
   const handleKeyDown = (e, currentSection, i, j) => {
+    // Evitar caracteres no numéricos o fraccionarios (solo permitimos Enter, backspace, flechas, números y signo menos)
+    if (['e', 'E', '+', '.', ','].includes(e.key)) {
+      e.preventDefault();
+      return;
+    }
+
     if (e.key === 'Enter') {
       e.preventDefault();
       let nextId = null;
@@ -260,7 +282,7 @@ const Calculadora = () => {
       <div className="controls" style={{ display: 'flex', gap: '20px', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
         <label>
           <strong>Tamaño del sistema: </strong> 
-          <input type="number" min="2" max="5" value={size} onChange={handleSizeChange} style={{marginLeft: '10px'}}/>
+          <input type="number" min="2" max="5" value={size} onChange={handleSizeChange} onFocus={(e) => e.target.select()} style={{marginLeft: '10px'}}/>
         </label>
         
         <label>
@@ -287,10 +309,11 @@ const Calculadora = () => {
                   <input 
                     id={`cell-A-${i}-${j}`}
                     key={`cell-${i}-${j}`} 
-                    type="text" 
+                    type="number" 
                     value={A[i][j]} 
                     onChange={(e) => updateA(i, j, e.target.value)} 
                     onKeyDown={(e) => handleKeyDown(e, 'A', i, j)}
+                    onFocus={(e) => e.target.select()}
                     style={{width: '65px', padding: '8px', textAlign: 'center', fontWeight: 'bold', color: '#1e293b'}}
                   />
                 ))}
@@ -310,10 +333,11 @@ const Calculadora = () => {
               <div key={`b-${i}`} className="matrix-row">
                 <input 
                   id={`cell-B-${i}`}
-                  type="text" 
+                  type="number" 
                   value={B[i]} 
                   onChange={(e) => updateB(i, e.target.value)} 
                   onKeyDown={(e) => handleKeyDown(e, 'B', i)}
+                  onFocus={(e) => e.target.select()}
                   style={{width: '65px', padding: '8px', textAlign: 'center', fontWeight: 'bold', color: '#1e293b'}}
                 />
               </div>
@@ -328,10 +352,11 @@ const Calculadora = () => {
               <div key={`x0-${i}`} className="matrix-row">
                 <input 
                   id={`cell-X0-${i}`}
-                  type="text" 
+                  type="number" 
                   value={X0[i]} 
                   onChange={(e) => updateX0(i, e.target.value)} 
                   onKeyDown={(e) => handleKeyDown(e, 'X0', i)}
+                  onFocus={(e) => e.target.select()}
                   style={{width: '65px', padding: '8px', textAlign: 'center', fontWeight: 'bold', color: '#1e293b'}}
                 />
               </div>
@@ -353,14 +378,14 @@ const Calculadora = () => {
         {(stopMode === 'iterations' || stopMode === 'both') && (
           <label>
             <strong>Número de Iteraciones (k):</strong>
-            <input type="number" min="1" max="100" value={iterations} onChange={(e) => setIterations(parseInt(e.target.value) || 1)} style={{marginLeft: '10px', width: '80px', padding: '5px'}}/>
+            <input type="number" min="1" max="100" value={iterations} onChange={(e) => setIterations(e.target.value)} onFocus={(e) => e.target.select()} style={{marginLeft: '10px', width: '80px', padding: '5px'}}/>
           </label>
         )}
 
         {(stopMode === 'tolerance' || stopMode === 'both') && (
           <label>
             <strong>Tolerancia:</strong>
-            <input type="number" step="any" min="0" value={tolerance} onChange={(e) => setTolerance(parseFloat(e.target.value) || 0)} style={{marginLeft: '10px', width: '120px', padding: '5px'}}/>
+            <input type="number" step="any" min="0" value={tolerance} onChange={(e) => setTolerance(e.target.value)} onFocus={(e) => e.target.select()} style={{marginLeft: '10px', width: '120px', padding: '5px'}}/>
           </label>
         )}
 
@@ -384,17 +409,19 @@ const Calculadora = () => {
             {(results.methodUsed === 'ambos' || results.methodUsed === 'jacobi') && (
               <div className="method-results" style={{ flex: 1, minWidth: '300px' }}>
                 <h4 style={{ color: '#0056b3' }}>Método de Jacobi</h4>
-                {results.jacobiSteps.map((step, index) => (
-                  <div key={`jacobi-${index}`} style={{marginBottom: '15px', padding: '15px', backgroundColor: '#fdfdfd', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'}}>
-                    <strong style={{ display: 'block', marginBottom: '8px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>Iteración k = {index + 1}</strong>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {step.map((val, i) => {
-                        const varName = ['x', 'y', 'z', 'w', 'v'][i] || `x_{${i+1}}`;
-                        return <div key={`j-val-${i}`}><code>{varName} = {val.toFixed(6)}</code></div>;
-                      })}
+                <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px', marginBottom: '10px' }}>
+                  {results.jacobiSteps.map((step, index) => (
+                    <div key={`jacobi-${index}`} style={{marginBottom: '15px', padding: '15px', backgroundColor: '#fdfdfd', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'}}>
+                      <strong style={{ display: 'block', marginBottom: '8px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>Iteración k = {index + 1}</strong>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {step.map((val, i) => {
+                          const varName = ['x', 'y', 'z', 'w', 'v'][i] || `x_{${i+1}}`;
+                          return <div key={`j-val-${i}`}><code>{varName} = {val.toFixed(6)}</code></div>;
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
                 {results.jacobiErrors && results.jacobiErrors.length > 0 && (
                   <div style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3f0', border: '1px solid #ffd6cc', borderRadius: '6px'}}>
                     <strong>Error final (norma Euclídea):</strong>{' '}
@@ -407,17 +434,19 @@ const Calculadora = () => {
             {(results.methodUsed === 'ambos' || results.methodUsed === 'gauss') && (
               <div className="method-results" style={{ flex: 1, minWidth: '300px' }}>
                 <h4 style={{ color: '#0056b3' }}>Método de Gauss-Seidel</h4>
-                {results.gaussSeidelSteps.map((step, index) => (
-                  <div key={`gs-${index}`} style={{marginBottom: '15px', padding: '15px', backgroundColor: '#fdfdfd', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'}}>
-                    <strong style={{ display: 'block', marginBottom: '8px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>Iteración k = {index + 1}</strong>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                      {step.map((val, i) => {
-                        const varName = ['x', 'y', 'z', 'w', 'v'][i] || `x_{${i+1}}`;
-                        return <div key={`gs-val-${i}`}><code>{varName} = {val.toFixed(6)}</code></div>;
-                      })}
+                <div style={{ maxHeight: '400px', overflowY: 'auto', paddingRight: '10px', marginBottom: '10px' }}>
+                  {results.gaussSeidelSteps.map((step, index) => (
+                    <div key={`gs-${index}`} style={{marginBottom: '15px', padding: '15px', backgroundColor: '#fdfdfd', border: '1px solid #ddd', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)'}}>
+                      <strong style={{ display: 'block', marginBottom: '8px', borderBottom: '1px solid #eee', paddingBottom: '4px' }}>Iteración k = {index + 1}</strong>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        {step.map((val, i) => {
+                          const varName = ['x', 'y', 'z', 'w', 'v'][i] || `x_{${i+1}}`;
+                          return <div key={`gs-val-${i}`}><code>{varName} = {val.toFixed(6)}</code></div>;
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
                 {results.gaussSeidelErrors && results.gaussSeidelErrors.length > 0 && (
                   <div style={{marginTop: '10px', padding: '10px', backgroundColor: '#fff3f0', border: '1px solid #ffd6cc', borderRadius: '6px'}}>
                     <strong>Error final (norma Euclídea):</strong>{' '}
