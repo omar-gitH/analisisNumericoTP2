@@ -215,6 +215,14 @@
   transform: scale(0.98);
 }
 
+.quiz-option.selected {
+  border-color: var(--primary-color);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--primary-color);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.2);
+  transform: scale(1.02);
+}
+
 .quiz-option.correct {
   border-color: #22c55e;
   background: #f0fdf4;

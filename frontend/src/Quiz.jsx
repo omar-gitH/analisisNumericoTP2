@@ -96,7 +96,7 @@ const questionBank = [
     answer: 1,
     explanation: 'La diagonal dominante es una condición suficiente, pero no necesaria: los métodos pueden converger aunque no se cumpla.',
   },
-  
+
   // Nuevas preguntas (para el pool aleatorio)
   {
     title: 'Velocidad de convergencia',
@@ -277,27 +277,99 @@ const questionBank = [
     ],
     answer: 2,
     explanation: 'El radio espectral (el máximo valor absoluto de sus autovalores) de la matriz de iteración debe ser estrictamente menor que 1 para que haya convergencia.',
+  },
+  {
+    title: 'Características de Jacobi',
+    question: 'Lo que caracteriza al método de Jacobi es: (opción múltiple)',
+    options: [
+      'Requiere un vector de valores iniciales.',
+      'Utiliza los valores recién calculados de inmediato.',
+      'Calcula todas las nuevas aproximaciones basándose únicamente en la iteración anterior.',
+      'Encuentra la respuesta exacta en el primer paso.'
+    ],
+    answer: [0, 2],
+    explanation: 'El método de Jacobi necesita un vector inicial para arrancar y, a diferencia de Gauss-Seidel, calcula todas las incógnitas de una iteración usando exclusivamente los datos de la iteración pasada.'
+  },
+  {
+    title: 'Características de Gauss-Seidel',
+    question: 'Al utilizar el método de Gauss-Seidel, podemos afirmar que: (opción múltiple)',
+    options: [
+      'Se aprovecha la información "fresca" o más reciente en cada paso.',
+      'Suele converger en menos iteraciones que Jacobi.',
+      'No requiere ningún criterio de paro.',
+      'Funciona perfectamente aunque haya ceros en la diagonal principal.'
+    ],
+    answer: [0, 1],
+    explanation: 'Gauss-Seidel incorpora cada nueva aproximación apenas se calcula, lo que generalmente acelera la convergencia comparado con Jacobi.'
+  },
+  {
+    title: 'El rol de la dominancia diagonal',
+    question: 'Una matriz estrictamente diagonalmente dominante es importante porque: (opción múltiple)',
+    options: [
+      'Garantiza que ambos métodos (Jacobi y Gauss-Seidel) van a converger.',
+      'Es una condición suficiente pero no absolutamente necesaria para la convergencia.',
+      'Es el único tipo de matriz que existe en la vida real.',
+      'Significa que todos los elementos de la matriz son ceros.'
+    ],
+    answer: [0, 1],
+    explanation: 'La dominancia diagonal es la condición suficiente clásica para asegurar la convergencia, aunque algunos sistemas pueden converger incluso si no la cumplen.'
+  },
+  {
+    title: 'Vectores y Tolerancia',
+    question: 'Sobre el vector inicial y la tolerancia, ¿qué enunciados son correctos? (opción múltiple)',
+    options: [
+      'El vector inicial sirve como punto de partida para el ciclo iterativo.',
+      'La tolerancia nos dice cuándo detener el algoritmo si el error es suficientemente pequeño.',
+      'La tolerancia siempre debe ser cero absoluto.',
+      'El vector inicial debe ser exactamente la solución correcta.'
+    ],
+    answer: [0, 1],
+    explanation: 'Todo método iterativo requiere un punto de inicio (vector inicial) y un criterio para detenerse basado en un error máximo permitido (tolerancia).'
+  },
+  {
+    title: 'El proceso iterativo',
+    question: 'Durante la ejecución de un método iterativo para resolver Ax = b: (opción múltiple)',
+    options: [
+      'En cada iteración nos acercamos más a la solución (si el método converge).',
+      'Se repite un conjunto de cálculos matemáticos utilizando los resultados anteriores.',
+      'Solo se utiliza la matriz A, ignorando por completo el vector b.',
+      'La cantidad de incógnitas cambia en cada iteración.'
+    ],
+    answer: [0, 1],
+    explanation: 'Iterar significa repetir un proceso; en este caso, se usan las soluciones previas para calcular nuevas aproximaciones progresivamente más exactas.'
+  },
+  {
+    title: 'Problemas al resolver',
+    question: '¿Qué nos impide resolver un sistema directamente con estos métodos sin modificarlo? (opción múltiple)',
+    options: [
+      'Tener un coeficiente igual a 0 en la diagonal principal.',
+      'Que el sistema sea no lineal (estos métodos son para sistemas lineales).',
+      'Usar un vector inicial de puros unos.',
+      'Tener términos independientes (el vector b) con valores negativos.'
+    ],
+    answer: [0, 1],
+    explanation: 'Si hay un 0 en la diagonal, el algoritmo intenta dividir por 0 y falla (requiere reordenar filas). Además, Jacobi y Gauss-Seidel están diseñados para sistemas lineales (Ax=b).'
   }
 ];
-
 // Cantidad de preguntas por cuestionario
 const QUESTIONS_PER_QUIZ = 8;
 
 function Quiz() {
   const [started, setStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOptions, setSelectedOptions] = useState([]);
+  const [isAnswered, setIsAnswered] = useState(false);
   const [score, setScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_TIME);
   const [finished, setFinished] = useState(false);
   const [quizQuestions, setQuizQuestions] = useState([]);
 
   const question = quizQuestions[currentQuestion];
-  const timedOut = started && !finished && selectedOption === null && timeLeft === 0;
+  const timedOut = started && !finished && !isAnswered && timeLeft === 0;
 
   useEffect(() => {
     // Si no ha empezado, o ya terminó, o hay una opción seleccionada, o el tiempo se acabó: detenemos el reloj
-    if (!started || finished || selectedOption !== null || timeLeft <= 0) {
+    if (!started || finished || isAnswered || timeLeft <= 0) {
       return undefined;
     }
 
@@ -307,7 +379,7 @@ function Quiz() {
     }, 1000);
 
     return () => clearTimeout(timerId);
-  }, [started, finished, selectedOption, timeLeft]);
+  }, [started, finished, isAnswered, timeLeft]);
 
   const startQuiz = (mode) => {
     let selectedQuestions = [];
@@ -318,12 +390,13 @@ function Quiz() {
       // Fixed quiz toma siempre las primeras 8 preguntas originales
       selectedQuestions = questionBank.slice(0, QUESTIONS_PER_QUIZ);
     }
-    
+
     setQuizQuestions(selectedQuestions);
     setStarted(true);
     setFinished(false);
     setCurrentQuestion(0);
-    setSelectedOption(null);
+    setSelectedOptions([]);
+    setIsAnswered(false);
     setScore(0);
     setTimeLeft(QUESTION_TIME);
   };
@@ -332,19 +405,36 @@ function Quiz() {
     setStarted(false);
     setFinished(false);
     setCurrentQuestion(0);
-    setSelectedOption(null);
+    setSelectedOptions([]);
+    setIsAnswered(false);
     setScore(0);
     setTimeLeft(QUESTION_TIME);
   };
 
   const selectOption = (optionIndex) => {
-    if (selectedOption !== null || timedOut) {
-      return;
-    }
+    if (isAnswered || timedOut) return;
 
-    setSelectedOption(optionIndex);
-    if (optionIndex === question.answer) {
-      setScore((currentScore) => currentScore + 1);
+    if (Array.isArray(question.answer)) {
+      const newSelection = selectedOptions.includes(optionIndex)
+        ? selectedOptions.filter(i => i !== optionIndex)
+        : [...selectedOptions, optionIndex];
+      setSelectedOptions(newSelection);
+    } else {
+      setSelectedOptions([optionIndex]);
+      setIsAnswered(true);
+      if (optionIndex === question.answer) {
+        setScore((currentScore) => currentScore + 1);
+      }
+    }
+  };
+
+  const submitMultiAnswer = () => {
+    if (isAnswered || timedOut) return;
+    setIsAnswered(true);
+    const correct = [...question.answer].sort();
+    const user = [...selectedOptions].sort();
+    if (JSON.stringify(correct) === JSON.stringify(user)) {
+      setScore((s) => s + 1);
     }
   };
 
@@ -355,20 +445,27 @@ function Quiz() {
     }
 
     setCurrentQuestion((questionIndex) => questionIndex + 1);
-    setSelectedOption(null);
+    setSelectedOptions([]);
+    setIsAnswered(false);
     setTimeLeft(QUESTION_TIME);
   };
 
   const getOptionClassName = (optionIndex) => {
-    if (selectedOption === null && !timedOut) {
-      return 'quiz-option';
+    if (!isAnswered && !timedOut) {
+      return selectedOptions.includes(optionIndex) ? 'quiz-option selected' : 'quiz-option';
     }
 
-    if (optionIndex === question.answer) {
+    const isCorrectAnswer = Array.isArray(question.answer)
+      ? question.answer.includes(optionIndex)
+      : optionIndex === question.answer;
+
+    const isSelected = selectedOptions.includes(optionIndex);
+
+    if (isCorrectAnswer) {
       return 'quiz-option correct';
     }
 
-    if (optionIndex === selectedOption) {
+    if (isSelected) {
       return 'quiz-option incorrect';
     }
 
@@ -385,7 +482,7 @@ function Quiz() {
             de convergencia.
           </p>
           <ul>
-            <li>{QUESTIONS_PER_QUIZ} preguntas de opción múltiple</li>
+            <li>{QUESTIONS_PER_QUIZ} preguntas, algunas de opción múltiple</li>
             <li>{QUESTION_TIME} segundos para responder cada pregunta</li>
             <li>Recibirás una explicación al responder</li>
           </ul>
@@ -424,7 +521,15 @@ function Quiz() {
     );
   }
 
-  const answered = selectedOption !== null || timedOut;
+  const answered = isAnswered || timedOut;
+  const isSuccess = () => {
+    if (Array.isArray(question.answer)) {
+      const correct = [...question.answer].sort();
+      const user = [...selectedOptions].sort();
+      return JSON.stringify(correct) === JSON.stringify(user);
+    }
+    return selectedOptions[0] === question.answer;
+  };
 
   return (
     <div className="quiz-game">
@@ -442,21 +547,21 @@ function Quiz() {
                   {/* Aguja de las horas */}
                   <line x1="12" y1="12" x2="12" y2="8" strokeWidth="3" />
                   {/* Aguja de los segundos animada */}
-                  <line 
-                    x1="12" y1="12" x2="12" y2="4" 
-                    style={{ 
-                      transform: `rotate(${((30 - timeLeft) / 30) * 360}deg)`, 
+                  <line
+                    x1="12" y1="12" x2="12" y2="4"
+                    style={{
+                      transform: `rotate(${((30 - timeLeft) / 30) * 360}deg)`,
                       transformOrigin: '12px 12px',
                       transition: 'transform 1s linear'
-                    }} 
+                    }}
                   />
                 </svg>
               </span>
               <span style={{ fontSize: '1.4em', minWidth: '3ch', textAlign: 'left' }}>{timeLeft}s</span>
             </div>
             <div className="quiz-timer-bar-bg">
-              <div 
-                className="quiz-timer-bar-fill" 
+              <div
+                className="quiz-timer-bar-fill"
                 style={{ width: `${(timeLeft / 30) * 100}%` }}
               />
             </div>
@@ -505,9 +610,21 @@ function Quiz() {
         ))}
       </div>
 
+      {!answered && Array.isArray(question.answer) && (
+        <button
+          className="quiz-primary-button"
+          type="button"
+          onClick={submitMultiAnswer}
+          disabled={selectedOptions.length === 0}
+          style={{ marginTop: '15px' }}
+        >
+          Confirmar Respuesta
+        </button>
+      )}
+
       {answered && (
-        <div className={`quiz-feedback ${selectedOption === question.answer ? 'success' : 'error'}`}>
-          <strong>{timedOut ? 'Se acabó el tiempo.' : selectedOption === question.answer ? '¡Correcto!' : 'Respuesta incorrecta.'}</strong>
+        <div className={`quiz-feedback ${isSuccess() ? 'success' : 'error'}`}>
+          <strong>{timedOut ? 'Se acabó el tiempo.' : isSuccess() ? '¡Correcto!' : 'Respuesta incorrecta.'}</strong>
           <p>{question.explanation}</p>
           <button className="quiz-next-button" type="button" onClick={nextQuestion}>
             {currentQuestion === quizQuestions.length - 1 ? 'Ver resultado' : 'Siguiente pregunta'}
